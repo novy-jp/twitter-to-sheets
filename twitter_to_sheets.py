@@ -24,12 +24,13 @@ service = build('sheets', 'v4', credentials=creds)
 
 # Twitter APIリクエストを送信してデータを取得
 def get_user_data(user_id):
-    url = f"https://api.twitter.com/2/users/{user_id}"
+    url = f"https://api.twitter.com/2/users/{user_id}?user.fields=public_metrics"
     headers = {"Authorization": f"Bearer {BEARER_TOKEN}"}
     response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
         data = response.json()
+        print("Twitter API response:", data)  # デバッグ用に追加
         followers_count = data['data']['public_metrics']['followers_count']
         following_count = data['data']['public_metrics']['following_count']
         return followers_count, following_count
@@ -39,6 +40,7 @@ def get_user_data(user_id):
 
 # Google Sheetsに書き込む
 def update_google_sheet(data):
+    print("Data to be written to Google Sheets:", data)  # デバッグ用に追加
     sheet = service.spreadsheets()
     body = {'values': data}
     result = sheet.values().append(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
